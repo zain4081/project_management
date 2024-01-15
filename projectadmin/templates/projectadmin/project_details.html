@@ -1,0 +1,34 @@
+<!-- project_detail.html -->
+{% extends 'projectadmin/base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h2 class="mt-4 mb-4">{{ project.name }}</h2>
+
+    <!-- Display project details -->
+
+    <!-- Task creation form -->
+    <h3 class="mt-4">Create Task</h3>
+    <form method="post" class="form">
+      {% csrf_token %}
+      {{ task_form.as_p }}
+      <button type="submit" class="btn btn-primary">Create Task</button>
+    </form>
+
+    <!-- Display tasks -->
+    <h3 class="mt-4">Project Tasks</h3>
+    {% if project.tasks.all %}
+      <ul>
+        {% for task in project.tasks.all %}
+          <li>
+            <strong>{{ task.title }}</strong>
+            <p>{{ task.description }}</p>
+            <p>Assigned to: {{ task.assigned_to.username }} | Role: {{ task.get_role_display }} | Progress: {{ task.progress }}% | Status: {{ task.get_status_display }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No tasks for this project.</p>
+    {% endif %}
+  </div>
+{% endblock %}

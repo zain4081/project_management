@@ -1,0 +1,53 @@
+{% extends 'projectadmin/base.html' %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="row mt-4">
+      <div class="col-md-8">
+        <h2>File Management</h2>
+      </div>
+      <div class="col-md-3">
+        
+      </div>
+    </div>
+    <hr />
+    <!-- Display Files Managment Code -->
+    <h2>Uploaded Files</h2>
+<table border="1">
+    <tr>
+        <th>File Name</th>
+        <th>Project/Task</th>
+        <th>Actions</th>
+    </tr>
+    {% for file_upload in file_uploads %}
+        <tr>
+            <td>{{ file_upload.file.name }}</td>
+            <td>
+                {% if file_upload.project %}
+                    Project: {{ file_upload.project.name }}
+                {% elif file_upload.task %}
+                    Task: {{ file_upload.task.title }}
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'download_file' file_upload.id %}">Download</a>
+                | <a href="{% url 'delete_file' file_upload.id %}">Delete</a>
+            </td>
+        </tr>
+    {% endfor %}
+    
+
+
+
+
+
+  </div>
+
+<script>
+        $(function (){
+            // Enable Bootstrap tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+{% endblock %}

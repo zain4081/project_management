@@ -1,0 +1,46 @@
+<!-- templates/myapp/edit_user.html -->
+
+{% extends 'projectadmin/base.html' %}
+
+{% block title %}Edit User | Admin Panel{% endblock %}
+
+
+{% block content %}
+<div class="container">
+        <h2>Update User Data </h2>
+        <hr />
+        <div class="container">
+        <form method="post" class="form" action="{% url 'edit_user' user.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}">
+            </div>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="role">Role:</label>
+                <select class="form-control" id="role" name="role">
+                    <option value="" {% if not user.role %}selected{% endif %}>Select Role</option>
+                    <option value="Project Manager"  {% if user.role == 'Project Manager' %}selected{% endif %}>Project Manager</option>
+                    <option value="Team Lead"  {% if user.role == 'Team Lead' %}selected{% endif %}>Team Lead</option>
+                    <option value="Developer"  {% if user.role == 'Developer' %}selected{% endif %}>Developer</option>
+                    <option value="Designer"  {% if user.role == 'Designer' %}selected{% endif %}>Designer</option>
+                    <option value="Quality Assurance Specialist"  {% if user.role == 'Quality Assurance Specialist' %}selected{% endif %}>Quality Assurance Specialist</option>`
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Leave blank to keep the same password">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'projectadmin/base_auth.html' %}
+
+{% block title %}Login | Project Management{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="card-title mb-0">Login</h3>
+                    {{ msg }}
+                </div>
+                <div class="card-body">
+                    <form method="post" class="form">
+                        {% csrf_token %}
+                         {{ form.non_field_errors }}
+                        <div class="form-group">
+                            <label for="username">Username:</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <p class="mb-0">Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

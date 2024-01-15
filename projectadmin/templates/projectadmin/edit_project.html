@@ -1,0 +1,21 @@
+<!-- edit_project.html -->
+{% extends 'projectadmin/base.html' %}
+
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Edit Project: {{ project.name }}</h2>
+    <form method="post" action="">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Update Project</button>
+      <a href="{% url 'projects' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+    <script>
+        $(document).ready(function (){
+           var manager = document.getElementById('id_manager');
+           manager.classList.add('form-control');
+        });
+</script>
+{% endblock %}

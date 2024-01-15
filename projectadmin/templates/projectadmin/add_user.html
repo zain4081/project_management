@@ -1,0 +1,25 @@
+<!-- add_user.html -->
+{% extends 'projectadmin/base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Add New User</h2>
+    <form method="post" action="">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Add User</button>
+      <a href="{% url 'users' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+    <script>
+        $(document).ready(function (){
+           var pass1 = document.getElementById('id_password1');
+           var pass2 = document.getElementById('id_password2');
+
+              pass1.classList.add('form-control');
+              pass2.classList.add('form-control');
+        });
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,67 @@
+{% extends 'projectadmin/base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <div class="container">
+    <h2 class="mt-4 mb-4">Create Project</h2>
+    <form method="post" class="form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        {% render_field form.name class="form-control"%}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.description.id_for_label }}">Description:</label>
+        {%  render_field form.description class="form-control" %}
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="{{ form.start_date.id_for_label }}">Start Date:</label>
+          {% render_field form.start_date class="form-control" %}
+        </div>
+
+        <div class="form-group col-md-6">
+          <label for="{{ form.end_date.id_for_label }}">End Date:</label>
+          {%  render_field form.end_date class="form-control" %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.visibility.id_for_label }}">Visibility:</label>
+        {% render_field  form.visibility class="form-control" %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.manager.id_for_label }}">Manager:</label>
+        {% render_field form.manager class="form-control" %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.team_members.id_for_label }}">Team Members:</label>
+        {% render_field form.team_members class="form-control" %}
+      </div>
+
+      <button type="submit" class="btn btn-primary">Create Project</button>
+    </form>
+  </div>
+
+{% load static %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Initialize datepickers
+      $('#id_start_date, #id_end_date').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true,
+        todayHighlight: true,
+      });
+    });
+  </script>
+{% endblock %}

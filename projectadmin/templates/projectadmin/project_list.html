@@ -1,0 +1,297 @@
+{% extends 'projectadmin/base.html' %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="row mt-4">
+      <div class="col-md-8">
+        <h2>Projects</h2>
+      </div>
+      <div class="col-md-3">
+        {% if user.is_authenticated and user.role in 'Admin,Project Manager' %}
+          <a href="{% url 'create_project' %}" class="btn btn-success float-right">Add Project</a>
+        {% endif %}
+      </div>
+    </div>
+    <hr />
+    <!-- Display all projects in a Bootstrap table -->
+    <table class="table table-bordered table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th>Project Name</th>
+          <th>Description</th>
+          <th>Manager</th>
+          <th>Team Members</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Uploads</th>
+          {% if user.is_authenticated and user.role in 'Admin,Project Manager' %}
+            <th>Action</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for project in projects %}<!--f01-->
+          <tr>
+            <td data-bs-toggle="collapse" data-bs-target="#tasks-{{ project.id }}" aria-expanded="false"
+                  aria-controls="tasks-{{ project.id }}">
+              {{ project.name }}
+            </td>
+            <td>{{ project.description }}</td>
+            <td>{{ project.manager }}</td>
+            <td>
+              {% for member in project.team_members.all %}
+                  {{ member.name }}{% if not forloop.last %},  {% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ project.start_date }}</td>
+            <td>{{ project.end_date }}</td>
+            <!-- Upload Project File-->
+            <td>
+              {% if project.fileupload_set.exists %}
+                <div class="col-10">{{ project.fileupload_set.first.file.name }}<div>
+                <div>
+                  <a href="{% url 'download_file' project.fileupload_set.first.id %}"><i class="fas fa-download"></i></a>
+                  <a href="{% url 'delete_file' project.fileupload_set.first.id %}" style="color: red;"><i class="fas fa-trash-alt"></i></a>
+                </div>
+              {% else %}
+                {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+                  <!-- Form for uploading a new file -->
+                  <form method="post" enctype="multipart/form-data" action="{% url 'upload_project_files' %}" class="mt-3">
+                    {% csrf_token %}
+                    <input type="file" name="file" accept=".pdf,.doc,.docx,.txt" required>
+                    <input type="hidden" name="project" value="{{ project.id }}">
+                    <br>
+                    <input type="submit" value="Upload Project File">
+                </form>
+                {% endif %}
+              {% endif %}             
+          </td>      
+            <!-- Link to add a new task for the project -->
+            {% if user.is_authenticated and user.role in 'Admin,Project Manager' %}
+              <td>
+                <a href="{% url 'edit_project' project.id %}" class="btn btn-info">Edit</a>
+                <a href="{% url 'delete_project' project.id %}" class="btn btn-danger">Delete</a>
+              </td>
+            {% endif %}
+          </tr>
+          <tr>
+            <td colspan="8" class="hiddenRow">
+              <div id="tasks-{{ project.id }}" class="collapse">
+                <!-- Sub-table for tasks -->
+                <table class="table table-warning">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th><b>{{ project.name }}</b> | Tasks</th>
+                      <th>Description</th>
+                      {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' %}
+                        <th>Assigned To</th>
+                      {% endif %}
+                      <th>Progress</th>
+                      <th>Uploads</th>
+                      {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' %}
+                        <th>Action</th>
+                      {% endif %}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for task in project.tasks.all %}<!--f02_task in project.task.all-->
+                        {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' or user.id == task.assigned_to.id  %}
+                          <tr>
+                            <td data-bs-toggle="collapse" data-bs-target="#subtasks-{{ task.id }}" aria-expanded="false"
+                                  aria-controls="subtasks-{{ task.id }}" style="max-width: 50px;!important">
+                              {{ task.title }}
+                            </td>
+                            <td>{{ task.description }}</td>
+                            {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' %}
+                            <td>{{ task.assigned_to.name }}</td>
+                            {% endif %}
+                            <td>
+                              {% if task.total == task.complete %}
+                                {% if task.total == 0%}
+                                <p style="color:grey;">Please Add Subtasks For Start Working</p>
+                                {% else %}
+                                  <p style="color:blue;">Completed</p>
+                                {% endif %}
+                              {% elif task.total > 0 and task.complete == 0 %}
+                                <p style="color:red;">Not Started</p>
+                              {% else%}
+                                <p style="color:green;">In Progress</p>
+                              {% endif %}
+                            </td>
+                            <td>
+                                {% if task.fileupload_set.exists %}
+                                  <div class="col-10">{{ task.fileupload_set.first.file.name }}<div>
+                                  <div>
+                                    <a href="{% url 'download_file' task.fileupload_set.first.id %}"><i class="fas fa-download"></i></a>
+                                    <a href="{% url 'delete_file' task.fileupload_set.first.id %}" style="color: red;"><i class="fas fa-trash-alt"></i></a>
+                                  </div>
+                                {% else %}
+                                  {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+                                    <!-- Form for uploading a new file -->
+                                    <div>
+                                      <form method="post" enctype="multipart/form-data" action="{% url 'upload_task_files' %}" class="mt-3">
+                                        {% csrf_token %}
+                                        <input type="file" name="file" accept=".pdf,.doc,.docx,.txt" required>
+                                        <input type="hidden" name="task" value="{{ task.id }}">
+                                        <input type="submit" value="Upload Task File"> 
+                                      </form>
+                                    </div>
+                                  {% endif %}
+                                {% endif %}
+                              </td>
+                              <td>
+                              {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+                                <form method="post" action="{% url 'delete_task' task.id %}" class="mt-3">
+                                  {% csrf_token %}
+                                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                              {% endif %}
+                            </td>
+                          </tr>
+                        {% endif %}
+                        <tr><!--tr001_for subtasks -->
+                          <td colspan="6" class="hiddenRow">
+                            <div id="subtasks-{{ task.id }}" class="collapse">
+                              <table class="table table-success">
+                                <thead class="thead thead-dark">
+                                  <th><b>{{ project.name }} | {{ task.title }}</b> | Sub_Tasks</th>
+                                  <th>Details</th>
+                                  <th>Status</th>
+                                  {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' %}
+                                    <th>Action</th>
+                                  {% endif %}
+                                </thead>
+                                <tbody>
+                                  {% for subtask in task.subtasks.all %}<!--f03_subtask in project.task.subtask.all-->
+                                    {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' or user.id == task.assigned_to.id  %}
+                                      <tr>
+                                        <td>{{ subtask.name }}</td>
+                                        <td>{{ subtask.details }}</td>
+                                        <td>
+                                          {% if subtask.current_status == 'Completed'%}
+                                            {{ subtask.current_status }}
+                                          {% else %}
+                                            <div>In Progress</div>
+                                            {% if user.is_authenticated and user.role in 'Admin' or user.id == task.assigned_to.id  %}
+                                              <div>
+                                                <form method="post" action="{% url 'update_status' subtask.id %}" class="form-inline mt-3">
+                                                  {% csrf_token %}
+                                                  <input type="hidden" name="status" value="Completed">
+                                                  <button type="submit" class="btn btn-success btn-sm">Mark as Complete</button>
+                                                </form>
+                                              </div>
+                                            {% endif %}
+                                          {% endif %}
+                                        </td>
+                                        {% if user.is_authenticated and user.role in 'Admin,Project Manager, Team Lead' %}
+                                          <td>
+                                            <form method="post" action="{% url 'delete_subtask' subtask.id %}" class="mt-3">
+                                              {% csrf_token %}
+                                              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>
+                                          </td>
+                                        {% endif %}
+                                      </tr>
+                                    {% endif %}
+                                  {% endfor %}<!--/f03_subtask in project.task.subtask.all-->
+                                  {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+                                      <tr><!--tr002_add subtasks -->
+                                        <form method="post" action="{% url 'add_subtask' task.id %}"  class="form-inline mt-3">
+                                          {% csrf_token %}
+                                          <td>
+                                            <div class="form-group mb-2 mr-2">
+                                              <label for="{{ sub_task_form.title.id_for_label }}" class="sr-only">Sub Title</label>
+                                              {{ sub_task_form.name }}
+                                            </div>
+                                          </td>
+                                          <td>
+                                            <div class="form-group mb-2 mr-2">
+                                              <label for="{{ sub_task_form.title.id_for_label }}" class="sr-only">details</label>
+                                              {{ sub_task_form.details }}
+                                            </div>
+                                          </td>
+                                          <td>
+                                            <div class="form-group mb-2 mr-2">
+                                              <label for="{{ sub_task_form.title.id_for_label }}" class="sr-only">status</label>
+                                              {{ sub_task_form.current_status }}
+                                            </div>
+                                          </td>
+                                          <td>
+                                            <div class="form-group mb-2">
+                                              <input type="hidden" name="task_id" value="{{ task.id }}">
+                                              <button type="submit" class="btn btn-success">Add Sub-Task</button>
+                                            </div>
+                                          </td>
+                                        </form> 
+                                      </tr><!--/tr002_add subtasks -->
+                                    {% endif %}
+                                </tbody>
+                              </table>
+                            </div>
+                          </td>
+                        </tr><!--/tr001_for subtasks -->
+                    {% endfor %}<!--/f02_task in project.task.all-->
+                    {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+                      <tr>
+                      <!-- Inline form to add a new task -->
+                        <form method="post" action="{% url 'add_task' project.id %}" class="form-inline mt-2">
+                          {% csrf_token %}
+                          <td>
+                            <div class="form-group mb-2 mr-2">
+                              <label for="{{ task_form.title.id_for_label }}" class="sr-only">Task Title</label>
+                              {{ task_form.title }}
+                            </div>
+                          </td>
+                          <td>
+                            <div class="form-group mb-2 mr-2">
+                              <label for="{{ task_form.description.id_for_label }}" class="sr-only">Description</label>
+                                {{ task_form.description }}
+                            </div>
+                          </td>
+                          <td colspan='2'>
+                            <div class="form-group mb-2 mr-2">
+                              <label for="{{ task_form.assigned_to.id_for_label }}" class="sr-only">Assigned To</label>
+                                {{ task_form.assigned_to }}
+                            </div>
+                          </td>
+                          {% comment %} <td>
+                            <div class="form-group mb-2 mr-2">
+                              <label for="{{ task_form.progress.id_for_label }}" class="sr-only">Progress</label>
+                              {{ task_form.progress }}
+                            </div>
+                          </td>
+                          <td>
+                            <div class="form-group mb-2 mr-2">
+                              <label for="{{ task_form.status.id_for_label }}" class="sr-only">Status</label>
+                              {{ task_form.status }}
+                            </div>
+                          </td> {% endcomment %}
+                          <input type="hidden" name="progress" id="progress" value="0">
+                          <input type="hidden" name="status" id="status" value="Not Started">
+                          <td colspan='2'>
+                            <div class="form-group mb-2">
+                              <input type="hidden" name="project_id" value="{{ project.id }}">
+                              <button type="submit" class="btn btn-success">Add Task</button>
+                            </div>
+                          </td>
+                        </form>
+                      </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}<!--/f01 -->
+      </tbody>
+    </table>
+  </div>
+
+<script>
+        $(function (){
+            // Enable Bootstrap tooltips
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+{% endblock %}

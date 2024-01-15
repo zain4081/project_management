@@ -1,0 +1,70 @@
+{% extends 'projectadmin/base.html' %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="row mt-4">
+      <div class="col-md-8">
+        <h2>Projects</h2>
+      </div>
+      <div class="col-md-3">
+        {% if user.is_authenticated and user.role in 'Admin,Project Manager' %}
+          <a href="{% url 'create_project' %}" class="btn btn-success float-right">Add Project</a>
+        {% endif %}
+      </div>
+    </div>
+    <hr />
+  <h2>All Projects and Uploaded Files</h2>
+
+  <table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+      <tr>
+        <th>Project Name</th>
+        <th>Upload File Name</th>
+        <th>Reupload</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project_detail in project_details %}
+        <tr>
+          <td>{{ project_detail.project.name }}</td>
+          <td>
+            {% if project_detail.files %}
+              {{ project_detail.files.first.file.name }}
+            {% else %}
+              No files uploaded
+            {% endif %}
+          </td>
+          <td>
+            <!-- Form for reuploading a new file -->
+            {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+              <form method="post" action="{% url 'upload_project_files' project_detail.project.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="file" accept=".pdf,.doc,.docx,.txt" required>
+                <button type="submit" class="btn btn-warning btn-sm">Reupload</button>
+              </form>
+            {% endif %}
+          </td>
+          <td>
+            <!-- Action buttons for delete/download -->
+            {% if user.is_authenticated and user.role in 'Admin,Project Manager,Team Lead' %}
+              <form method="post" action="{% url 'delete_file' project_detail.files.first.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            {% endif %}
+            <a href="{% url 'download_file' project_detail.files.first.id %}" class="btn btn-primary btn-sm">Download</a>
+          </td>
+        </tr>
+      {% endfor %}
+      {{project_details}}
+    </tbody>
+  </table>
+  <script>
+    $(function (){
+        // Enable Bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
+{% endblock %}

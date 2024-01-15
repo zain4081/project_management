@@ -1,0 +1,24 @@
+<!-- templates/myapp/add_role.html -->
+
+{% extends 'projectadmin/base.html' %}
+
+{% block title %}Add Role | Admin Panel{% endblock %}
+
+{% block content %}
+    <h2>Add Role to User: {{ user.name }}</h2>
+    <form method="post" class="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select class="form-control" id="role" name="role" required>
+                <option value="Project Manager">Project Manager</option>
+                <option value="Team Lead">Team Lead</option>
+                <option value="Developer">Developer</option>
+                <option value="Designer">Designer</option>
+                <option value="Quality Assurance Specialist">Quality Assurance Specialist</option>
+
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Add Role</button>
+    </form>
+{% endblock %}

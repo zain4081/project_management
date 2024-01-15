@@ -1,0 +1,19 @@
+<!-- hTML-->
+<!-- Inline form to add a new task -->
+<form method="get" action="{% url 'add_task' project.id %}" class="form-inline mt-2">
+    {% csrf_token %}
+    <td>
+      <div class="form-group mb-2 mr-2">
+        <label for="{{ task_form.title.id_for_label }}" class="sr-only">Task Title</label>
+        {{ task_form.title }}
+      </div>
+    </td>
+    <td>
+      <div class="form-group mb-2">
+        <input type="hidden" name="project_id" value="{{ project.id }}">
+        <button type="submit" class="btn btn-success">Add Task</button>
+      </div>
+    </td>
+  </form>
+
+path('projects/<int:project_id>/add_task/', add_task, name='add_task'),

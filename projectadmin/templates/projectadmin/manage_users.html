@@ -1,0 +1,62 @@
+<!-- templates/myapp/manage_users.html -->
+
+{% extends 'projectadmin/base.html' %}
+
+{% block title %}Manage Users | Admin Panel{% endblock %}
+
+{% block content %}
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <h2>Users</h2>
+        </div>
+        <div class="col-md-3">
+             <a href="{% url 'add_user' %}" class="btn btn-success float-right">Add User</a>
+        </div>
+    </div>
+
+    <hr />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        {% if user.role %}
+                            {{ user.role }}
+                        {% else %}
+                            <form method="post" class="form" action="{% url 'add_role' user.id %}" >
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="role">Role:</label>
+                                    <select class="form-control" id="role" name="role" required>
+                                        <option value="Project Manager">Project Manager</option>
+                                        <option value="Team Lead">Team Lead</option>
+                                        <option value="Developer">Developer</option>
+                                        <option value="Designer">Designer</option>
+                                        <option value="Quality Assurance Specialist">Quality Assurance Specialist</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success">Add Role</button>
+                            </form>
+                         {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_user' user.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'delete_user' user.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

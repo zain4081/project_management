@@ -1,0 +1,15 @@
+<!-- templates/myapp/delete_user.html -->
+
+{% extends 'projectadmin/base.html' %}
+
+{% block title %}Delete User | Admin Panel{% endblock %}
+
+{% block content %}
+    <h2>Delete User: {{ user.name }}</h2>
+    <p>Are you sure you want to delete this user?</p>
+    <form method="post" action="{% url 'delete_user' user.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'users' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}
